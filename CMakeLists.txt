@@ -97,6 +97,9 @@ option(HTTPLIB_USE_ZLIB_IF_AVAILABLE "Uses ZLIB (if available) to enable Zlib co
 option(HTTPLIB_COMPILE "If ON, uses a Python script to split the header into a compilable header & source file (requires Python v3)." OFF)
 # Lets you disable the installation (useful when fetched from another CMake project)
 option(HTTPLIB_INSTALL "Enables the installation target" ON)
+# These two options are added by atina-project: for easier access & management.
+option(HTTPLIB_INSTALL_LIB_ONLY "Enables the installation target, but only install compiled lib." OFF)
+option(HTTPLIB_INSTALL_LIB_PATH "The path the compiled lib should be installed to." ${CMAKE_INSTALL_LIBDIR})
 option(HTTPLIB_TEST "Enables testing and builds tests" OFF)
 option(HTTPLIB_REQUIRE_BROTLI "Requires Brotli to be found & linked, or fails build." OFF)
 option(HTTPLIB_USE_BROTLI_IF_AVAILABLE "Uses Brotli (if available) to enable Brotli decompression support." ON)
@@ -196,6 +199,8 @@ if(HTTPLIB_COMPILE)
 			SOVERSION "${${PROJECT_NAME}_VERSION_MAJOR}.${${PROJECT_NAME}_VERSION_MINOR}"
 			OUTPUT_NAME cpp-httplib
 	)
+
+	set(HTTPLIB_SPLITED_INCLUDE_DIR ${_httplib_build_includedir} CACHE INTERNAL ${_httplib_build_includedir})
 else()
 	# This is for header-only.
 	set(_INTERFACE_OR_PUBLIC INTERFACE)
@@ -270,7 +275,15 @@ else()
 	)
 endif()
 
-if(HTTPLIB_INSTALL)
+if(HTTPLIB_COMPILE AND HTTPLIB_INSTALL_LIB_ONLY)
+
+	install(TARGETS ${PROJECT_NAME}
+		RUNTIME ${HTTPLIB_INSTALL_LIB_PATH}
+		ARCHIVE ${HTTPLIB_INSTALL_LIB_PATH}
+		LIBRARY ${HTTPLIB_INSTALL_LIB_PATH}
+	)
+
+elseif(HTTPLIB_INSTALL)
 	# Creates the export httplibTargets.cmake
 	# This is strictly what holds compilation requirements
 	# and linkage information (doesn't find deps though).
