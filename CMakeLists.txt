@@ -99,7 +99,7 @@ option(HTTPLIB_COMPILE "If ON, uses a Python script to split the header into a c
 option(HTTPLIB_INSTALL "Enables the installation target" ON)
 # These two options are added by atina-project: for easier access & management.
 option(HTTPLIB_INSTALL_LIB_ONLY "Enables the installation target, but only install compiled lib." OFF)
-option(HTTPLIB_INSTALL_LIB_PATH "The path the compiled lib should be installed to." ${CMAKE_INSTALL_LIBDIR})
+option(HTTPLIB_INSTALL_LIB_PATH "The path the compiled lib should be installed to." OFF)
 option(HTTPLIB_TEST "Enables testing and builds tests" OFF)
 option(HTTPLIB_REQUIRE_BROTLI "Requires Brotli to be found & linked, or fails build." OFF)
 option(HTTPLIB_USE_BROTLI_IF_AVAILABLE "Uses Brotli (if available) to enable Brotli decompression support." ON)
@@ -277,10 +277,16 @@ endif()
 
 if(HTTPLIB_COMPILE AND HTTPLIB_INSTALL_LIB_ONLY)
 
+	if(NOT ${HTTPLIB_INSTALL_LIB_PATH} OR "${HTTPLIB_INSTALL_LIB_PATH}" STREQUAL "")
+		set(_install_lib_path ${CMAKE_INSTALL_LIBDIR})
+	else()
+		set(_install_lib_path ${HTTPLIB_INSTALL_LIB_PATH})
+	endif()
+
 	install(TARGETS ${PROJECT_NAME}
-		RUNTIME ${HTTPLIB_INSTALL_LIB_PATH}
-		ARCHIVE ${HTTPLIB_INSTALL_LIB_PATH}
-		LIBRARY ${HTTPLIB_INSTALL_LIB_PATH}
+		RUNTIME DESTINATION ${_install_lib_path}
+		ARCHIVE DESTINATION ${_install_lib_path}
+		LIBRARY DESTINATION ${_install_lib_path}
 	)
 
 elseif(HTTPLIB_INSTALL)
