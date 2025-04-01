@@ -104,6 +104,9 @@ option(HTTPLIB_TEST "Enables testing and builds tests" OFF)
 option(HTTPLIB_REQUIRE_BROTLI "Requires Brotli to be found & linked, or fails build." OFF)
 option(HTTPLIB_USE_BROTLI_IF_AVAILABLE "Uses Brotli (if available) to enable Brotli decompression support." ON)
 option(HTTPLIB_USE_CERTS_FROM_MACOSX_KEYCHAIN "Enable feature to load system certs from the Apple Keychain." ON)
+
+option(HTTPLIB_LIB_NO_SOVERSION "Disable soversion in set_target_properties" OFF)
+
 # Defaults to static library
 option(BUILD_SHARED_LIBS "Build the library as a shared library instead of static. Has no effect if using header-only." OFF)
 if (BUILD_SHARED_LIBS AND WIN32 AND HTTPLIB_COMPILE)
@@ -193,12 +196,19 @@ if(HTTPLIB_COMPILE)
 			$<BUILD_INTERFACE:${_httplib_build_includedir}/httplib.h>
 			$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/httplib.h>
 	)
-	set_target_properties(${PROJECT_NAME}
-		PROPERTIES
-			VERSION ${${PROJECT_NAME}_VERSION}
-			SOVERSION "${${PROJECT_NAME}_VERSION_MAJOR}.${${PROJECT_NAME}_VERSION_MINOR}"
-			OUTPUT_NAME cpp-httplib
-	)
+	if(HTTPLIB_LIB_NO_SOVERSION)
+		set_target_properties(${PROJECT_NAME}
+				PROPERTIES
+					OUTPUT_NAME cpp-httplib
+		)
+	else()
+		set_target_properties(${PROJECT_NAME}
+			PROPERTIES
+				VERSION ${${PROJECT_NAME}_VERSION}
+				SOVERSION "${${PROJECT_NAME}_VERSION_MAJOR}.${${PROJECT_NAME}_VERSION_MINOR}"
+				OUTPUT_NAME cpp-httplib
+		)
+	endif()
 
 	set(HTTPLIB_SPLITED_INCLUDE_DIR ${_httplib_build_includedir} CACHE INTERNAL ${_httplib_build_includedir})
 else()
