@@ -277,11 +277,7 @@ endif()
 
 if(HTTPLIB_COMPILE AND HTTPLIB_INSTALL_LIB_ONLY)
 
-	if(NOT ${HTTPLIB_INSTALL_LIB_PATH} OR "${HTTPLIB_INSTALL_LIB_PATH}" STREQUAL "")
-		set(_install_lib_path ${CMAKE_INSTALL_LIBDIR})
-	else()
-		set(_install_lib_path ${HTTPLIB_INSTALL_LIB_PATH})
-	endif()
+	set(_install_lib_path ${HTTPLIB_INSTALL_LIB_PATH})
 
 	install(TARGETS ${PROJECT_NAME}
 		RUNTIME DESTINATION ${_install_lib_path}
